@@ -9,4 +9,7 @@ setup(
     entry_points={
         'console_scripts': ['{appname} = {appname}.__main__:main'.format(appname=appname)]
     },
+    install_requires = [],
+    author = "minamorl",
+    author_email = "minamorl@minamorl.com",
 )
