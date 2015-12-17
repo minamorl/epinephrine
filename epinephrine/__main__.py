@@ -32,7 +32,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
 
 
-if __name__ == "__main__":
+def main():
     HOST, PORT = "localhost", 9999
 
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
@@ -43,3 +43,5 @@ if __name__ == "__main__":
         server.server_close()
         print("bye.")
 
+if __name__ == '__main__':
+    main()
