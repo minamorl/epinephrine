@@ -41,7 +41,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
 
 def main():
-    HOST, PORT = "localhost", 9999
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", default=9999, metavar='int', type=int)
+    args = parser.parse_args()
+    HOST, PORT = "localhost", args.port
 
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
     try:

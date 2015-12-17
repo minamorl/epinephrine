@@ -1,8 +1,9 @@
 import socket
 import sys
+import os
 
 def send(data):
-    HOST, PORT = "localhost", 9999
+    HOST, PORT = "localhost", int(os.environ.get("TEST_PORT"))
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
