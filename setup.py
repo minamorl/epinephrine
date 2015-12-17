@@ -7,7 +7,9 @@ setup(
     version = "0.0.1",
     packages = find_packages(),
     entry_points={
-        'console_scripts': ['{appname} = {appname}.__main__:main'.format(appname=appname)]
+        'console_scripts': [
+            '{appname} = {appname}.__main__:main'.format(appname=appname)
+        ]
     },
     install_requires = [],
     author = "minamorl",
