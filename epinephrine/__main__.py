@@ -5,10 +5,12 @@ storage = []
 PREFIX = "#"
 CMD_RETRIVE = "RETRIVE"
 CMD_INSERT = "INSERT"
+CMD_LENGTH = "LENGTH"
+CMD_CLEAR = "CLEAR"
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        global l
+        global storage
         data = self.request.recv(1024).strip().decode()
         print("send from {}".format(self.client_address[0]))
         if data.startswith(PREFIX + CMD_RETRIVE):
@@ -30,6 +32,12 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 self.request.sendall(b"0")
             return
 
+        if data == PREFIX + CMD_LENGTH:
+            self.request.sendall(str(len(storage)).encode())
+
+        if data == PREFIX + CMD_CLEAR:
+            storage = []
+            self.request.sendall(b"1")
 
 
 def main():
