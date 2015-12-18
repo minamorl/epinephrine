@@ -1,6 +1,7 @@
 # epinephrine
 In-memory database
 
+[![PyPI version](https://badge.fury.io/py/epinephrine.svg)](https://badge.fury.io/py/epinephrine)
 
 ## Installation
 ```
