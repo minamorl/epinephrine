@@ -44,8 +44,9 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", default=9999, metavar='int', type=int)
+    parser.add_argument("--bind", default="localhost")
     args = parser.parse_args()
-    HOST, PORT = "localhost", args.port
+    HOST, PORT = args.bind, args.port
 
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
     try:
