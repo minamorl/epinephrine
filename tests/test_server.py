@@ -33,3 +33,7 @@ def test_pagination():
     assert "1" == send(dummy)
     assert "data\ndata\ndata" == send("#RETRIVE:3:0")
     assert "" == send("#RETRIVE:3:1")
+
+def test_dump():
+    assert "1" == send("#DUMP")
+    dummy = "#INSERT:data"
