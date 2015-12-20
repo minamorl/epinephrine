@@ -58,7 +58,7 @@ class Handler(socketserver.BaseRequestHandler):
 
     import functools
     @functools.lru_cache()
-    def get_storage():
+    def get_storage(self):
         return Storage(sendall=self.request.sendall)
 
     def handle(self):
