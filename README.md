@@ -3,6 +3,8 @@ In-memory database
 
 [![PyPI version](https://badge.fury.io/py/epinephrine.svg)](https://badge.fury.io/py/epinephrine)
 
+[![Circle CI](https://circleci.com/gh/minamorl/epinephrine.svg?style=svg)](https://circleci.com/gh/minamorl/epinephrine)
+
 ## Installation
 ```
 pip install epinephrine
