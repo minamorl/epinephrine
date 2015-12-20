@@ -1,54 +1,70 @@
 import socketserver
+from . import *
 
-storage = []
 
-PREFIX = "#"
-CMD_RETRIVE = "RETRIVE"
-CMD_INSERT = "INSERT"
-CMD_LENGTH = "LENGTH"
-CMD_CLEAR = "CLEAR"
-CMD_DUMP = "DUMP"
+class Storage():
+    def __init__(self, storage=[], sendall=None):
+        self.storage = storage
+        self.sendall = sendall
 
-SIG_OK = b"1"
-SIG_FAIL = b"0"
+    def handle(self, signal):
+        command_list = [
+            (CMD_RETRIVE, self.command_retrive),
+            (CMD_INSERT, self.command_insert),
+            (CMD_LENGTH, self.command_length),
+            (CMD_CLEAR, self.command_clear),
+            (CMD_DUMP, self.command_dump),
+        ]
 
-class MyTCPHandler(socketserver.BaseRequestHandler):
+        for command_str, func in command_list:
+            if signal.startswith(PREFIX + command_str):
+                return func(signal[1:])
+
+    def command_retrive(self, data):
+        try:
+            _, line, page = data.split(":")
+            count = int(line) * int(page)
+            count = count if count >= 0 else 0
+            ret = self.storage[count:count + int(line)]
+            self.sendall("\n".join(ret).encode())
+        except:
+            self.sendall(SIG_FAIL)
+
+    def command_insert(self, data):
+        try:
+            _, data = data.split(":")
+            self.storage.append(data)
+            self.sendall(SIG_OK)
+        except:
+            self.sendall(SIG_FAIL)
+
+    def command_length(self, data):
+        self.sendall(str(len(self.storage)).encode())
+
+    def command_clear(self, data):
+        self.storage = []
+        self.sendall(SIG_OK)
+
+    def command_dump(self, data):
+        import pickle
+        import os
+        import sys
+        pickle.dump(self.storage, open(os.path.join(os.getcwd(), "dump.epdb"), "wb"))
+        self.sendall(SIG_OK)
+
+
+
+class Handler(socketserver.BaseRequestHandler):
+
+    import functools
+    @functools.lru_cache()
+    def get_storage():
+        return Storage(sendall=self.request.sendall)
+
     def handle(self):
-        global storage
         data = self.request.recv(1024).strip().decode()
         print("send from {}".format(self.client_address[0]))
-        if data.startswith(PREFIX + CMD_RETRIVE):
-            try:
-                _, line, page = data.split(":")
-                ret = storage[int(line)*int(page):int(line)*int(page)+int(line)]
-                self.request.sendall("\n".join(ret).encode())
-            except:
-                self.request.sendall(SIG_FAIL)
-            return
-        
-        if data.startswith(PREFIX + CMD_INSERT):
-            try:
-                _, data = data.split(":")
-                storage.append(data)
-                print("\n".join(storage))
-                self.request.sendall(SIG_OK)
-            except:
-                self.request.sendall(SIG_FAIL)
-            return
-
-        if data == PREFIX + CMD_LENGTH:
-            self.request.sendall(str(len(storage)).encode())
-
-        if data == PREFIX + CMD_CLEAR:
-            storage = []
-            self.request.sendall(SIG_OK)
-
-        if data == PREFIX + CMD_DUMP:
-            import pickle
-            import os
-            import sys
-            pickle.dump(storage, open(os.path.join(os.getcwd(), "dump.epdb"), "wb"))
-            self.request.sendall(SIG_OK)
+        return self.get_storage().handle(data)
 
 def main():
     import argparse
@@ -58,7 +74,7 @@ def main():
     args = parser.parse_args()
     HOST, PORT = args.bind, args.port
 
-    server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
+    server = socketserver.TCPServer((HOST, PORT), Handler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

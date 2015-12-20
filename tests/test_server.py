@@ -1,21 +1,28 @@
 import socket
 import sys
 import os
+import functools
+
+result = None
+
+
+import functools
+@functools.lru_cache()
+def get_storage():
+    from epinephrine.__main__ import Storage
+    def _(x):
+        global result
+        result = x
+    return Storage(sendall=_)
 
 def send(data):
-    HOST, PORT = "localhost", int(os.environ.get("TEST_PORT"))
+    storage = get_storage().handle(data)
+    return result.decode()
+    
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    try:
-        sock.connect((HOST, PORT))
-        sock.sendall(bytes(data + "\n", "utf-8"))
-
-        return str(sock.recv(1024), "utf-8")
-    finally:
-        sock.close()
 
 def test_send():
+    assert "1" == send("#CLEAR")
     dummy = "#INSERT:data"
     assert "1" == send(dummy)
     dummy = "#INSERTdata"
