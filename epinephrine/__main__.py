@@ -9,18 +9,18 @@ class Storage():
 
     def handle(self, signal):
         command_list = [
-            (CMD_RETRIVE, self.command_retrive),
-            (CMD_INSERT, self.command_insert),
-            (CMD_LENGTH, self.command_length),
-            (CMD_CLEAR, self.command_clear),
-            (CMD_DUMP, self.command_dump),
+            (CMD_RETRIVE, self.retrive),
+            (CMD_INSERT, self.insert),
+            (CMD_LENGTH, self.length),
+            (CMD_CLEAR, self.clear),
+            (CMD_DUMP, self.dump),
         ]
 
         for command_str, func in command_list:
             if signal.startswith(PREFIX + command_str):
                 return func(signal[1:])
 
-    def command_retrive(self, data):
+    def retrive(self, data):
         try:
             _, line, page = data.split(":")
             count = int(line) * int(page)
@@ -30,7 +30,7 @@ class Storage():
         except:
             self.sendall(SIG_FAIL)
 
-    def command_insert(self, data):
+    def insert(self, data):
         try:
             _, data = data.split(":")
             self.storage.append(data)
@@ -38,14 +38,14 @@ class Storage():
         except:
             self.sendall(SIG_FAIL)
 
-    def command_length(self, data):
+    def length(self, data):
         self.sendall(str(len(self.storage)).encode())
 
-    def command_clear(self, data):
+    def clear(self, data):
         self.storage = []
         self.sendall(SIG_OK)
 
-    def command_dump(self, data):
+    def dump(self, data):
         import pickle
         import os
         import sys
